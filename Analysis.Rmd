@@ -99,7 +99,7 @@ According to the R-squared values, the explained part of the variation is above
 the MPG -- such as aerodynamic properties of the chassis, bearing and suspension 
 quality; potentially a good achievement.
 
-# Conclusion
+# Summary
 
 With the given data, no reliable evidence of a relationship between 
 transmission type and MPG has been found using even the most plausible 
