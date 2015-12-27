@@ -15,10 +15,11 @@ levels(mtcars$vs) = c("vertical", "straight")
 
 ## Executive Summary
 
-The analysis of the given data did not suffice to prove a relationship between 
-the transmission type (automatic/manual) and the miles per gallon (MPG). The 
-final model suggests an increase in MPG of 0.276 (+- 2.75), which is equal to a 
-random noise with a 84.2% chance.
+The analysis of the given data (_mtcars_) did not suffice to prove a 
+relationship between the transmission type (automatic/manual) and the miles per 
+gallon (MPG). The final model suggests an increase in MPG of 0.276 (+- 2.75), 
+which is equal to a random noise with a 84.2% chance.
+
 To conclude with more confidence, more data, potentially about high MPG/automatic 
 transmission and low MPG/manual transmission cars is needed.
 
@@ -26,8 +27,8 @@ transmission and low MPG/manual transmission cars is needed.
 
 The analysis is based on the mtcars data set which is bundled with R. The R help
 contains a description of the data set. It consists of 11 fields as seen in
-figure 1. Except for the _V/S_ field interpretation was provided there, for that
-one a little investigation was necessary (see appendix).
+figure 1. Except for the _V/S_ (_vs_) field interpretation was provided there, 
+for that one a little investigation was necessary (see appendix).
 
 For this analysis the _am_ variable is converted to a factor with levels
 _"automatic"_ and _"manual"_, and _vs_ is similarly dealt with.
@@ -59,9 +60,9 @@ choice.
 
 ## Augmented models
 
-In the following, a series of nested models will attempt to refine the initial
+In the following, a series of nested models aim to refine the initial
 conclusion. When adjusting for further variables, the significance of the AM
-variable disappears and no further refinement brings it back.
+variable disappears and no further refinement recovers it.
 
 1. Introducing weight into the model (fig. 5) removes the effect the 
 transmission type formerly seemed to have. The p-value of AM increases to 0.988.
@@ -85,8 +86,8 @@ that the three cars are very similar in horsepower. This is a convenient covaria
 candidate both numerically (it is near-continuous) and semantically (increasing 
 hp and keeping all other aspect equal is a technological challenge to a 
 designer, other factors are likely to degrade when having to compromise).
-Including it and its second power further improves the models giving much 
-smaller residuals (cca. -2 to +4) than before (cca. -4 to +6).
+Including it and consequently its second power further improves the models 
+giving much smaller residuals (cca. -2 to +4) than before (cca. -4 to +6).
 
 ## Justification of the model modifications
 
@@ -109,7 +110,7 @@ p-values of variable-specific t-tests.
 Any visible relationship of the type sought seems to be too weak compared to the 
 prediction error, which -- if there is a relationship at all, is probably down 
 to having a dataset too small in size, or too much focused on automatic 
-transmission cars with high MPG and manual ones with a low MPG.
+transmission cars with low MPG and manual ones with a high MPG.
 
 # Appendix: code and figures
 
@@ -126,34 +127,6 @@ wt|Weight (1000 lbs)||
 
 For vs, "0 means a V-engine, and 1 straight engine". Source:
 http://stackoverflow.com/questions/18617174/r-mtcars-dataset-meaning-of-vs-variable
-
-<!--
-Field|Interpetation
------|------------
-mpg|Miles/(US) gallon
-cyl|Number of cylinders
-disp|Displacement
-hp|Gross horsepower
-drat|Rear axle ratio
-wt|Weight (1000 lbs)
-qsec|1/4 mile time
-vs|V/S
-am|Transmission (0 = automatic, 1 = manual)
-gear|Number of forward gears
-carb|Number of careburetors
--->
-
-<!-- ### Code 1: Data tidying
-
-```{r eval=FALSE, echo=TRUE}
-data(mtcars)
-mtcars$am = factor(mtcars$am, levels = c(0, 1))
-levels(mtcars$am) = c("automatic", "manual")
-mtcars$vs = factor(mtcars$vs, levels = c(0, 1))
-levels(mtcars$vs) = c("vertical", "straight")
-```
-
--->
 
 <!-- TODO: a ggplot2 alternative, if exists, is preferred (use alpha) -->
 ### Figure 2: Examining relationships - correlation matrix plot
@@ -183,7 +156,6 @@ cat("adjusted R-squared: ", ss$adj.r.squared, "\n")
 
 ### Figure 5: Automatic vs. manual fuel consumption modelled with vehicle weight
 ```{r "figure5plot", fig.height = 3, echo = FALSE,  fig.align="center"}
-#```{r "figure5", echo = FALSE}
 # add weight
 model.nested = lm(mpg ~ am + wt, data = mtcars)
 
@@ -238,80 +210,3 @@ plot.residuals(model.nested.4)
 ```{r "figure 8", echo = FALSE}
 anova(model.simple, model.nested, model.nested.2, model.nested.3, model.nested.4)
 ```
-
-<!--
-
-Do I use dummies to get rid of the effect of the outliers?
-No.
-
-TODO: accomplish this with the last model
-
-is.auto = mtcars$am == "automatic"
-model.nested.auto.line = 
-  model.nested$coefficients[1] + 
-  model.nested$coefficients[3] * mtcars$wt[is.auto];
-model.nested.manual.line =
-  model.nested$coefficients[1] + 
-  model.nested$coefficients[2] +
-  model.nested$coefficients[3] * mtcars$wt[!is.auto];
-lines(mtcars$wt[is.auto], model.nested.auto.line, col = "blue")
-lines(mtcars$wt[!is.auto], model.nested.manual.line, col = "green")
-
-
-
-
-#
-# ammanual     -1.8621     1.4041  -1.326  0.19548  
-# 
-# the MPG of manual transmission cars seems lower than that of automatic ones.
-# the difference is -1.8621, however, this can be down to the driving style of
-# the test drivers. 
-
-o.wt = order(mtcars$wt)
-plot(mtcars$wt, mtcars$mpg)
-lines(mtcars$wt[o.wt], fitted(model.nested.2)[o.wt])
-
-# plot(mtcars$wt, mtcars$mpg)
-# lines(mtcars$wt[o.wt], fitted(model.nested.3)[o.wt])
-
-
-
-
-
-# we may try to remove the outliers
-mtcars.2 = mtcars[-c(8, 18, 20), ]
-# model.nested.2.noout = update(model.nested.2, data = mtcars.2)
-#summary(model.nested.2.noout)
-# plot(model.nested.2.noout)
-
-# but there is at least one similarity, the low nr. of careburators
-plot(mtcars$carb, resid(model.nested.2))
-
-# beyond carb, the residual has a relatively high correlation with mtcars$qsec
-# and mtcars$hp.
-# actually it is reasonable to assume that the more horsepower the car has, the 
-# shorter it takes to accelerate up on a quarter mile. 
-# 
-# mtcars$hp / mtcars$wt has a higher correlation with the residuals than qsec
-# (highest individual covariate)
-
-# print("Nested model #3")
-# model.nested.3 = lm(mpg ~ am + wt + I(wt ^ 2) + I(hp / wt), data = mtcars)
-
-print("Nested model #3")
-model.nested.3 = lm(mpg ~ am + wt + I(wt ^ 2) + hp, data = mtcars)
-summary(model.nested.4)
-
-# model.nested.5 = lm(mpg ~ am + wt + I(wt ^ 2) + hp + I(hp ^ 2), data = mtcars)
-# summary(model.nested.5)
-
-model.nested.6 = lm(mpg ~ am + wt + I(wt ^ 2) + hp + I(hp ^ 2) + I(hp * wt), data = mtcars)
-
-# plot(mtcars$mpg, col = "red")
-# points(fitted(model.nested.6), col = "blue")
-# 
-# 
-
-plot(mtcars$mpg, fitted(model.nested.6))
-
--->
